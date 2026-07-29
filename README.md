@@ -53,3 +53,12 @@ swift build -c release
   idle/walking/fleeing/dragging/falling state machine.
 - `CreatureWindow.swift` — window level/behavior (e.g. change `.floating` to
   `.screenSaver` if you want it to float above full-screen apps too).
+
+---
+
+## agent_mind
+
+This repo also contains `agent_mind/`, a toolkit for visualizing an AI agent
+system as a "mind": a shared core surrounded by department-specialized
+knowledge clusters, rendered as an interactive graph. See
+[`agent_mind/README.md`](agent_mind/README.md) for details.
