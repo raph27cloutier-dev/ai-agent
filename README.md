@@ -1,77 +1,64 @@
-# agent_mind
+# Potato Buddy
 
-A small toolkit for visualizing an AI agent system as a "mind": one shared
-**core** (identity, goals, shared context) surrounded by **department**
-clusters (specialized sub-agents), each holding a tree of memory/skill
-nodes. It renders as a dark, physics-based, interactive graph — drag nodes,
-zoom, hover a node to see what it represents.
+A tiny pixel-art potato that lives on your Mac's Dock — a menu bar app inspired
+by the "desktop creatures" built with Claude Code. It idles, wanders back and
+forth along the Dock, scurries away if your cursor gets too close, and can be
+picked up and dropped by dragging.
 
-This is the pattern behind dashboards like the one that inspired this repo:
-a central hub with knowledge radiating out into domains such as Marketing,
-Operations, Sales, Customer, Internal, and Back Office.
+The sprite is drawn procedurally (no image assets) from a small pixel grid
+defined in `Sources/PotatoBuddy/PotatoSprite.swift`, so it's easy to reskin
+into a different creature by changing the shapes/colors there.
 
-## Quick start
+## Requirements
 
-```bash
-pip install -r requirements.txt
-python examples/generate_demo.py   # writes examples/demo.html
+- macOS 12+
+- Xcode Command Line Tools (`xcode-select --install`) for the `swift` toolchain
+
+This app uses AppKit (`Cocoa`), so it only builds and runs on macOS — it
+can't be built or tested in a Linux environment.
+
+## Run
+
+```sh
+swift run
 ```
 
-Open `examples/demo.html` in a browser. It's fully self-contained (no
-network calls at view time) and fully interactive.
+This launches the app in the foreground of your terminal. Look for the 🥔
+icon in the menu bar for controls (Show/Hide, Come Here, Quit). Press
+Ctrl-C in the terminal to stop it.
 
-## Using your own agents
+## Build a standalone binary
 
-Build an `AgentMind` out of your own department agents and whatever they
-know (skills, memories, tasks, docs — anything you want represented as a
-node):
-
-```python
-from agent_mind import AgentMind, Department, MemoryNode, build_graph, render
-
-mind = AgentMind(
-    name="My Agent System",
-    core_nodes=["identity", "goals", "tool access", "shared memory"],
-    departments=[
-        Department(
-            key="support",
-            label="SUPPORT",
-            subtitle="tickets · macros · escalation",
-            color="#4f8cf0",
-            icon="\U0001F4AC",
-            nodes=[
-                MemoryNode("ticket triage rules"),
-                MemoryNode("macros", children=[MemoryNode("refund macro")]),
-            ],
-        ),
-        # ...more departments
-    ],
-)
-
-graph = build_graph(mind)
-render(graph, "my_mind.html", title=mind.name)
+```sh
+swift build -c release
+.build/release/PotatoBuddy &
 ```
 
-## How it maps to a real agent architecture
+## How it behaves
 
-- **Core** = the shared context every sub-agent can see: identity, mission,
-  active goals, tool credentials, org-wide policies.
-- **Department** = a specialized sub-agent (or a role/skill cluster within
-  one agent) responsible for one business domain.
-- **Memory nodes** = the individual facts, skills, docs, or past
-  interactions that department knows about, structured as a tree so
-  related memories chain off a common parent (e.g. `content calendar` →
-  `blog topics` → `SEO keywords`).
+- **Idle / walking**: wanders left and right along the top edge of the Dock,
+  pausing occasionally, blinking every few seconds.
+- **Fleeing**: if your cursor gets close (and is roughly at Dock height), the
+  potato panics and runs the other way.
+- **Draggable**: click and drag to pick it up; release to drop it — it falls
+  back down to the Dock.
+- Runs as an accessory app (no Dock icon, no app-switcher entry) — only the
+  menu bar icon shows.
 
-Swap `agent_mind/sample_data.py` for a loader that pulls this structure
-from your actual agent framework (vector store metadata, a skills
-registry, a memory database, etc.) to get a live picture of what your
-agents collectively know.
+## Customizing
 
-## Files
+- `PotatoSprite.swift` — pixel grid, colors, expressions (normal/blink/
+  scared/surprised) and leg poses.
+- `CreatureController.swift` — speeds, flee radius, timings, and the
+  idle/walking/fleeing/dragging/falling state machine.
+- `CreatureWindow.swift` — window level/behavior (e.g. change `.floating` to
+  `.screenSaver` if you want it to float above full-screen apps too).
 
-- `agent_mind/models.py` — data model (`AgentMind`, `Department`, `MemoryNode`)
-- `agent_mind/graph.py` — builds a `networkx` graph from an `AgentMind`
-- `agent_mind/visualize.py` — renders the graph to interactive HTML via `pyvis`
-- `agent_mind/sample_data.py` — example six-department mind used by the demo
-- `examples/generate_demo.py` — generates `examples/demo.html`
+---
+
+## agent_mind
+
+This repo also contains `agent_mind/`, a toolkit for visualizing an AI agent
+system as a "mind": a shared core surrounded by department-specialized
+knowledge clusters, rendered as an interactive graph. See
+[`agent_mind/README.md`](agent_mind/README.md) for details.
